@@ -51,15 +51,9 @@ A las salidas filtradas (y a la entrada, para comparar con los mismos datos) se 
 | R1 (motor apagado) | 44.48 | +9.86 | +8.99 |
 | R2 (PWM 60 %) | 39.10 | +4.27 | +3.36 |
 | R3 (PWM 100 %) | 34.76 | +13.21 | +12.82 |
-## Conclusión y regla de selección mecatrónica
+## Análisis del segundo eje 
 
-- **IIR Butterworth (orden 2):** Recomendado para **sistemas de control en tiempo real** en el ESP32. Ejecuta **3.3 veces más rápido** (~21 µs/muestra) y genera la **mitad de retardo** (~5 muestras / 0.05 s) con una atenuación de ruido casi idéntica a la del FIR.
-- **FIR Ventana Hamming (orden 20):** Recomendado para **posprocesamiento y análisis offline**, donde la **fase lineal exacta** es indispensable para no deformar morfológicamente la señal.
-
-## Análisis del segundo eje (Requisito N5)
-
-Se analizó el **Eje X** (sin componente principal de gravedad, $\bar{x}_X \approx 0.05\text{ m/s}^2$). Al aplicar el modelo $P_s = (\bar{x})^2$ y $P_n = \sigma^2$, la $\text{SNR}_{\text{in}}$ cae de $34.76\text{ dB}$ (Eje Z) a $18.25\text{ dB}$ (Eje X) en R3. Esto evidencia la limitación del modelo: la SNR en dB es relativa a la componente DC; en ejes sin gravedad la SNR disminuye drásticamente a pesar de que la potencia de ruido absoluto ($P_n$) generada por el motor es la misma.
-
+Se analizó el **Eje X** (sin componente principal de gravedad, $\bar{x}_{X} \approx 0.05\text{ m/s}^2$). Al aplicar el modelo $P_s = (\bar{x})^2$ y $P_n = \sigma^2$, la $\text{SNR}_{\text{in}}$ cae de 34.76 dB (Eje Z) a 18.25 dB (Eje X) en R3. Esto evidencia la limitación del modelo: la SNR en dB es relativa a la componente DC; en ejes sin gravedad la SNR disminuye drásticamente a pesar de que la potencia de ruido absoluto ($P_n$) generada por el motor es la misma.
 ## Entrega
 
 - **Etiqueta de entrega:** `entrega-proy2`
