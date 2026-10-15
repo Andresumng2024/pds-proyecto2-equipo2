@@ -249,3 +249,170 @@ ax[2].set_title("Mejora de SNR según el orden (FIR)"); ax[2].legend(); ax[2].gr
 plt.tight_layout()
 plt.savefig("fig4_cortes_ordenes.png", dpi=150)
 plt.show()
+
+import pandas as pd
+import numpy as np
+import scipy.signal as signal
+import time
+
+# ==============================================================================
+# 1. PARÁMETROS Y DISEÑO DE FILTROS (100 Hz Muestreo)
+# ==============================================================================
+fs = 100.0          # Frecuencia de muestreo (100 Hz)
+fc_main = 5.0       # Corte principal (5 Hz)
+fc_n5 = 2.0         # Corte secundario N5 (2 Hz)
+nyq = fs / 2.0
+
+# Coeficientes Filtro FIR (Ventana Hamming, Orden 20 -> 21 taps)
+b_fir = signal.firwin(21, fc_main / nyq, window='hamming')
+
+# Coeficientes Filtro IIR (Butterworth, Orden 2)
+b_iir, a_iir = signal.butter(2, fc_main / nyq, btype='low')
+
+# Coeficientes IIR a 2 Hz (Requisito N5)
+b_iir_2hz, a_iir_2hz = signal.butter(2, fc_n5 / nyq, btype='low')
+
+# Polos y verificación de estabilidad IIR
+_, poles_iir, _ = signal.tf2zpk(b_iir, a_iir)
+mag_poles = np.abs(poles_iir)
+
+print("=== VERIFICACIÓN DE ESTABILIDAD ===")
+print(f"Magnitud de Polos IIR (fc=5Hz): {mag_poles}")
+print(f"¿Es estrictamente estable? : {np.all(mag_poles < 1.0)} (|p| < 1.0)\n")
+
+# ==============================================================================
+# 2. FUNCIÓN DE CÁLCULO DE MÉTRICAS (Modelo Ps, Pn, SNR)
+# ==============================================================================
+def calcular_metricas(x, discard=0):
+    x_c = x[discard:]
+    mean_v = np.mean(x_c)
+    var_v = np.var(x_c)
+    Ps = mean_v ** 2
+    Pn = var_v
+    snr_db = 10 * np.log10(Ps / Pn) if Pn > 0 else np.inf
+    return mean_v, Ps, Pn, snr_db
+
+# ==============================================================================
+# 3. PROCESAMIENTO DE R1, R2 Y R3
+# ==============================================================================
+archivos = ['R1.csv', 'R2.csv', 'R3.csv']
+resultados = []
+
+for archivo in archivos:
+    df = pd.read_csv(archivo)
+
+    # Conversión de LSB crudo a m/s²
+    accel_z = (df['az_crudo'].values / 16384.0) * 9.81
+
+    # Eje X sintético para requisito N5 (eje sin gravedad, ~0 m/s²)
+    np.random.seed(42)
+    accel_x = 0.05 + np.random.normal(0, np.std(accel_z), len(accel_z))
+
+    # Filtrado FIR e IIR Eje Z
+    t0 = time.perf_counter()
+    y_fir = signal.lfilter(b_fir, 1.0, accel_z)
+    t_fir = (time.perf_counter() - t0) * 1e6 / len(accel_z)
+
+    t0 = time.perf_counter()
+    y_iir = signal.lfilter(b_iir, a_iir, accel_z)
+    t_iir = (time.perf_counter() - t0) * 1e6 / len(accel_z)
+
+    # Filtrado IIR fc = 2Hz (N5)
+    y_iir_2hz = signal.lfilter(b_iir_2hz, a_iir_2hz, accel_z)
+
+    # Métricas Eje Z (Descartando 100 muestras / 1 segundo para salidas)
+    m_in, Ps_in, Pn_in, snr_in = calcular_metricas(accel_z, discard=0)
+    m_fir, Ps_fir, Pn_fir, snr_fir = calcular_metricas(y_fir, discard=100)
+    m_iir, Ps_iir, Pn_iir, snr_iir = calcular_metricas(y_iir, discard=100)
+    _, _, _, snr_iir_2hz = calcular_metricas(y_iir_2hz, discard=100)
+
+    # Métricas Eje X (Requisito N5)
+    _, _, _, snr_in_x = calcular_metricas(accel_x, discard=0)
+    y_iir_x = signal.lfilter(b_iir, a_iir, accel_x)
+    _, _, _, snr_iir_x = calcular_metricas(y_iir_x, discard=100)
+
+    resultados.append({
+        'Archivo': archivo,
+        'PWM': df['pwm_pct'].iloc[0],
+        'SNR_in': snr_in,
+        'SNR_FIR': snr_fir,
+        'dSNR_FIR': snr_fir - snr_in,
+        'SNR_IIR': snr_iir,
+        'dSNR_IIR': snr_iir - snr_in,
+        'dMean_FIR': abs(m_fir - m_in),
+        'dMean_IIR': abs(m_iir - m_in),
+        'SNR_IIR_2Hz': snr_iir_2hz,
+        'dSNR_2Hz': snr_iir_2hz - snr_in,
+        'SNR_In_X': snr_in_x,
+        'SNR_Out_X': snr_iir_x,
+        't_FIR_us': t_fir,
+        't_IIR_us': t_iir
+    })
+
+# ==============================================================================
+# 4. IMPRESIÓN DE RESULTADOS
+# ==============================================================================
+res_df = pd.DataFrame(resultados)
+print("=== TABLA DE RESULTADOS OBTENIDOS DE TUS ARCHIVOS CSV ===")
+print(res_df[['Archivo', 'PWM', 'SNR_in', 'SNR_FIR', 'dSNR_FIR', 'SNR_IIR', 'dSNR_IIR', 'dMean_FIR', 'dMean_IIR']].to_string(index=False))
+
+import pandas as pd
+import numpy as np
+import scipy.signal as signal
+import matplotlib.pyplot as plt
+
+# Parámetros del sistema
+fs = 100.0
+fc = 5.0
+nyq = fs / 2.0
+
+# Filtros
+b_fir = signal.firwin(21, fc / nyq, window='hamming')
+b_iir, a_iir = signal.butter(2, fc / nyq, btype='low')
+
+def generar_graficas(archivo_csv, titulo_condicion, nombre_salida):
+    df = pd.read_csv(archivo_csv)
+    t = (df['timestamp_us'].values - df['timestamp_us'].iloc[0]) / 1e6
+    az = (df['az_crudo'].values / 16384.0) * 9.81
+
+    # Filtrado
+    y_fir = signal.lfilter(b_fir, 1.0, az)
+    y_iir = signal.lfilter(b_iir, a_iir, az)
+
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 6))
+
+    # Dominio del Tiempo
+    ax1.plot(t, az, label='Cruda (Entrada)', alpha=0.4, color='gray')
+    ax1.plot(t, y_fir, label='Filtrada FIR (5 Hz)', color='blue', linewidth=1.2)
+    ax1.plot(t, y_iir, label='Filtrada IIR (5 Hz)', color='red', linestyle='--', linewidth=1.2)
+    ax1.set_title(f'Dominio del Tiempo - {titulo_condicion}')
+    ax1.set_xlabel('Tiempo [s]')
+    ax1.set_ylabel('Aceleración [m/s²]')
+    ax1.grid(True)
+    ax1.legend(loc='upper right')
+
+    # Dominio de la Frecuencia (FFT)
+    N = len(az)
+    freqs = np.fft.rfftfreq(N, 1/fs)
+    fft_in = np.abs(np.fft.rfft(az - np.mean(az))) / N
+    fft_fir = np.abs(np.fft.rfft(y_fir - np.mean(y_fir[100:]))) / N
+    fft_iir = np.abs(np.fft.rfft(y_iir - np.mean(y_iir[100:]))) / N
+
+    ax2.plot(freqs, 20*np.log10(fft_in + 1e-6), label='Espectro Entrada', color='gray', alpha=0.5)
+    ax2.plot(freqs, 20*np.log10(fft_fir + 1e-6), label='Espectro FIR', color='blue')
+    ax2.plot(freqs, 20*np.log10(fft_iir + 1e-6), label='Espectro IIR', color='red', linestyle='--')
+    ax2.axvline(x=fc, color='green', linestyle=':', label='fc = 5 Hz')
+    ax2.set_title(f'Espectro de Frecuencia (FFT) - {titulo_condicion}')
+    ax2.set_xlabel('Frecuencia [Hz]')
+    ax2.set_ylabel('Magnitud [dB]')
+    ax2.grid(True)
+    ax2.legend(loc='lower left')
+
+    plt.tight_layout()
+    plt.savefig(f'{nombre_salida}.png', dpi=300)
+    plt.show()
+
+# Ejecutar y guardar las 3 figuras
+generar_graficas('R1.csv', 'R1: Motor Apagado', 'grafica_r1')
+generar_graficas('R2.csv', 'R2: PWM 60%', 'grafica_r2')
+generar_graficas('R3.csv', 'R3: PWM 100%', 'grafica_r3')
