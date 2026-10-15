@@ -1,4 +1,4 @@
-Registro,Ps,Pn,SNR_entrada_dB,SNR_FIR_dB,dSNR_FIR_dB,SNR_IIR_dB,dSNR_IIR_dB,cambio_media_FIR,cambio_media_IIR,orden_FIR,orden_IIR,retardo_FIR_muestras,retardo_IIR_muestras,tiempo_FIR_us,tiempo_IIR_us,estab_FIR,estab_IIR
-R1,219750352,7841.5,44.48,54.34,9.86,53.46,8.99,-0.07,-0.04,20,2,10,5,232.6,39.1,estable (sin realimentacion),estable (polos 0.80 < 1)
-R2,219504561,26993.8,39.1,43.37,4.27,42.46,3.36,0.12,0.44,20,2,10,5,232.1,40.5,estable (sin realimentacion),estable (polos 0.80 < 1)
-R3,218942549,73115.0,34.76,47.97,13.21,47.58,12.82,-0.31,-0.15,20,2,10,5,244.7,34.7,estable (sin realimentacion),estable (polos 0.80 < 1)
+Registro,Ps,Pn,SNR_entrada_dB,SNR_entrada_2000muestras_dB,SNR_FIR_dB,dSNR_FIR_dB,SNR_IIR_dB,dSNR_IIR_dB,cambio_media_FIR,cambio_media_IIR,orden_FIR,orden_IIR,retardo_FIR_muestras,retardo_IIR_muestras,tiempo_FIR_us,tiempo_IIR_us,estab_FIR,estab_IIR
+R1,219750352,7841.5,44.48,44.51,54.34,9.86,53.46,8.99,-0.07,-0.04,20,2,10,5,69.1,20.7,estable (sin realimentacion),estable (polos 0.80 < 1)
+R2,219504561,26993.8,39.1,39.04,43.37,4.27,42.46,3.36,0.12,0.44,20,2,10,5,67.5,20.8,estable (sin realimentacion),estable (polos 0.80 < 1)
+R3,218942549,73115.0,34.76,34.79,47.97,13.21,47.58,12.82,-0.31,-0.15,20,2,10,5,67.6,20.7,estable (sin realimentacion),estable (polos 0.80 < 1)
