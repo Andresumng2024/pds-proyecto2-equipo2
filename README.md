@@ -56,7 +56,7 @@ A las salidas filtradas (y a la entrada, para comparar con los mismos datos) se 
 
 - **Etiqueta de entrega:** `entrega-proy2`
 - **Fecha de entrega:** 15/10/2026
-- **Último commit evaluado:** `[b6834de ]`
+- **Último commit evaluado:** b6834de``
 - **Responsabilidad individual:**
   - Andrés Sánchez (código 7004389): montaje, circuito del motor, código del ESP32 y secciones 1–3 del notebook.
   - Daniel Andrés Gutiérrez (código 7004055): informe, GitHub y sección 4 del notebook.
