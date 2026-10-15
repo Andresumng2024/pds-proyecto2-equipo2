@@ -11,6 +11,7 @@ Se midió el ruido del eje Z de un acelerómetro (MPU6050) en reposo con tres co
 - **Plataforma:** ESP32 con MicroPython + IMU MPU6050 (módulo GY-521)
 - **Muestreo:** 100 Hz (frecuencia real medida: 100.00 Hz), 20 s por registro (2000 muestras), escala ±2 g (16384 cuentas = 1 g)
 - **Motor:** alimentado a 5 V mediante TIP120, PWM de 1 kHz
+- **Dataset:** R1, R2 y R3 — versión del 14/10/2026
 
 ## Archivos
 
@@ -22,7 +23,8 @@ Se midió el ruido del eje Z de un acelerómetro (MPU6050) en reposo con tres co
 | `tabla_resultados.csv` | Tabla de resultados R1–R3 |
 | `tabla_cortes_ordenes.csv` | Barrido de frecuencia de corte y orden |
 | `fig1_senales_espectro.png`, `fig2_filtradas.png`, `fig3_respuesta_polos.png`, `fig4_cortes_ordenes.png` | Gráficas del informe |
-| `PDS_Proyecto2_EquipoXX.tex` / `.pdf` | Informe |
+| `pds_proyecto2_notebook.py` | Copia del notebook exportada como script de Python |
+| `PDS_Proyecto2_Equipo02.pdf` | Informe (6 páginas) |
 
 ## Cómo reproducir
 
@@ -52,8 +54,9 @@ A las salidas filtradas (y a la entrada, para comparar con los mismos datos) se 
 
 ## Entrega
 
-- **Etiqueta de entrega:** `[completar con el nombre del release]`
+- **Etiqueta de entrega:** `entrega-proy2`
+- **Fecha de entrega:** 15/10/2026
 - **Último commit evaluado:** `[completar con el código del commit]`
 - **Responsabilidad individual:**
-  - Andrés Sánchez: `[completar]`
-  - Daniel Andrés Gutiérrez: `[completar]`
+  - Andrés Sánchez (código 7004389): montaje, circuito del motor, código del ESP32 y secciones 1–3 del notebook.
+  - Daniel Andrés Gutiérrez (código 7004055): informe, GitHub y sección 4 del notebook.
