@@ -53,7 +53,7 @@ A las salidas filtradas (y a la entrada, para comparar con los mismos datos) se 
 | R3 (PWM 100 %) | 34.76 | +13.21 | +12.82 |
 ## Análisis del segundo eje 
 
-Se analizó el **Eje X** (sin componente principal de gravedad, $\bar{x}_{X} \approx 0.05\text{ m/s}^2$). Al aplicar el modelo $P_s = (\bar{x})^2$ y $P_n = \sigma^2$, la $\text{SNR}_{\text{in}}$ cae de 34.76 dB (Eje Z) a 18.25 dB (Eje X) en R3. Esto evidencia la limitación del modelo: la SNR en dB es relativa a la componente DC; en ejes sin gravedad la SNR disminuye drásticamente a pesar de que la potencia de ruido absoluto ($P_n$) generada por el motor es la misma.
+Se analizó el **Eje X** (sin componente principal de gravedad, media_X ≈ 0.05 m/s²). Al aplicar el modelo P_s = (media)² y P_n = varianza, la SNR de entrada cae de 34.76 dB (Eje Z) a 18.25 dB (Eje X) en R3. Esto evidencia la limitación del modelo: la SNR en dB es relativa a la componente DC; en ejes sin gravedad la SNR disminuye drásticamente a pesar de que la potencia de ruido absoluto (P_n) generada por el motor es la misma.
 ## Entrega
 
 - **Etiqueta de entrega:** `entrega-proy2`
